@@ -1,5 +1,7 @@
 package com.fido.model;
 
+import java.util.Set;
+
 public class User {
 	
 	/**
@@ -22,6 +24,9 @@ public class User {
 	 * Name
 	 */
 	private String name;
+	
+	
+	private Set<Device> devices;
 
 	/**
 	 * @return the id
@@ -78,4 +83,20 @@ public class User {
 	public void setName(String name) {
 		this.name = name;
 	}
+
+	/**
+	 * @return the devices
+	 */
+	public Set<Device> getDevices() {
+		return devices;
+	}
+
+	/**
+	 * @param devices the devices to set
+	 */
+	public void setDevices(Set<Device> devices) {
+		this.devices = devices;
+	}
+	
+	
 }

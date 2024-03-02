@@ -1,10 +1,14 @@
 package com.fido.entity;
 
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 @Entity
 public class UserEntity {
@@ -21,6 +25,9 @@ public class UserEntity {
 	
 	
 	private String name;
+	
+	@OneToMany (mappedBy = "userEntity", cascade = CascadeType.ALL)
+	private Set<DeviceEntity> deviceEntities;
 
 
 	/**
@@ -85,4 +92,22 @@ public class UserEntity {
 	public void setName(String name) {
 		this.name = name;
 	}
+
+
+	/**
+	 * @return the deviceEntities
+	 */
+	public Set<DeviceEntity> getDeviceEntities() {
+		return deviceEntities;
+	}
+
+
+	/**
+	 * @param deviceEntities the deviceEntities to set
+	 */
+	public void setDeviceEntities(Set<DeviceEntity> deviceEntities) {
+		this.deviceEntities = deviceEntities;
+	}
+	
+	
 }

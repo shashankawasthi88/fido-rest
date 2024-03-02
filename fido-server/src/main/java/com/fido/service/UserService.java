@@ -1,12 +1,17 @@
 package com.fido.service;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.persistence.EntityNotFoundException;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fido.entity.DeviceEntity;
 import com.fido.entity.UserEntity;
+import com.fido.model.Device;
 import com.fido.model.User;
 import com.fido.repository.UserRepository;
 
@@ -37,6 +42,7 @@ public class UserService {
 		UserEntity userEntity = this.modelMapper.map(user, UserEntity.class);
 		System.out.println(userEntity.getName()+ " "+ userEntity.getUserPhoneNo()+ " "+ userEntity.getPassword());
 		userEntity = this.userRepository.save(userEntity);
+		// Device should not be added when the user is being created
 		return this.modelMapper.map(userEntity, User.class);
 		
 	}
@@ -51,14 +57,23 @@ public class UserService {
 	{
 		UserEntity userEntity = this.userRepository.findById(id).orElse(null);
 		
-		if (userEntity!= null)
-		{
-			return this.modelMapper.map(userEntity, User.class);
-		}
-		else
+		if (userEntity == null)
 		{
 			throw new EntityNotFoundException(id.toString());
 		}
+		User user = this.modelMapper.map(userEntity, User.class);
+		Set<Device> devices = new HashSet<Device>();
+		user.setDevices(devices);
+		// Handle devices if added to the user
+		if (userEntity.getDeviceEntities()!= null && !userEntity.getDeviceEntities().isEmpty())
+		{
+			for( DeviceEntity deviceEntity: userEntity.getDeviceEntities())
+			{
+				Device device = this.modelMapper.map(deviceEntity, Device.class);
+				devices.add(device);
+			}
+		}
+		return user;
 	}
 	
 	
@@ -75,8 +90,34 @@ public class UserService {
 			throw new EntityNotFoundException(user.getId().toString());
 		}
 		userEntity = this.modelMapper.map(user, UserEntity.class);
+		// Handle devices if added to the user
+		if(user.getDevices()!= null && !user.getDevices().isEmpty())
+		{
+			Set<DeviceEntity> deviceEntities = new HashSet<DeviceEntity>();
+			userEntity.setDeviceEntities(deviceEntities);
+			for (Device device: user.getDevices())
+			{
+				DeviceEntity deviceEntity = this.modelMapper.map(device, DeviceEntity.class);
+				deviceEntities.add(deviceEntity);
+			}
+		}
 		userEntity = this.userRepository.save(userEntity);
-		return this.modelMapper.map(userEntity, User.class);
+		
+		user = this.modelMapper.map(userEntity, User.class);
+		
+		// re add devices if added to the user
+		if (userEntity.getDeviceEntities()!=null && !userEntity.getDeviceEntities().isEmpty())
+		{
+			Set<Device> devices = new HashSet<Device>();
+			user.setDevices(devices);
+			for (DeviceEntity deviceEntity: userEntity.getDeviceEntities())
+			{
+				Device device = this.modelMapper.map(deviceEntity, Device.class);
+				devices.add(device);
+			}
+			
+		}
+		return user;
 		
 	}
 	
@@ -93,7 +134,6 @@ public class UserService {
 		{
 			throw new EntityNotFoundException(id.toString());
 		}
-		
 		this.userRepository.delete(userEntity);	
 		return Boolean.TRUE;
 	}
