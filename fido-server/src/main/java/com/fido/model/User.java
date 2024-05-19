@@ -26,6 +26,17 @@ public class User {
 	private String name;
 	
 	
+	/**
+	 * Email
+	 */
+	private String email;
+	
+	/**
+	 * Image URL
+	 */
+	private String imageURL;
+	
+	
 	private Set<Device> devices;
 
 	/**
@@ -96,6 +107,34 @@ public class User {
 	 */
 	public void setDevices(Set<Device> devices) {
 		this.devices = devices;
+	}
+
+	/**
+	 * @return the email
+	 */
+	public String getEmail() {
+		return email;
+	}
+
+	/**
+	 * @param email the email to set
+	 */
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	/**
+	 * @return the imageURL
+	 */
+	public String getImageURL() {
+		return imageURL;
+	}
+
+	/**
+	 * @param imageURL the imageURL to set
+	 */
+	public void setImageURL(String imageURL) {
+		this.imageURL = imageURL;
 	}
 	
 	

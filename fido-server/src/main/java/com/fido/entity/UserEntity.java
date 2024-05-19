@@ -26,6 +26,16 @@ public class UserEntity {
 	
 	private String name;
 	
+	/**
+	 * Email
+	 */
+	private String email;
+	
+	/**
+	 * Image URL
+	 */
+	private String imageURL;
+	
 	@OneToMany (mappedBy = "userEntity", cascade = CascadeType.ALL)
 	private Set<DeviceEntity> deviceEntities;
 
@@ -108,6 +118,37 @@ public class UserEntity {
 	public void setDeviceEntities(Set<DeviceEntity> deviceEntities) {
 		this.deviceEntities = deviceEntities;
 	}
-	
+
+
+	/**
+	 * @return the email
+	 */
+	public String getEmail() {
+		return email;
+	}
+
+
+	/**
+	 * @param email the email to set
+	 */
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+
+	/**
+	 * @return the imageURL
+	 */
+	public String getImageURL() {
+		return imageURL;
+	}
+
+
+	/**
+	 * @param imageURL the imageURL to set
+	 */
+	public void setImageURL(String imageURL) {
+		this.imageURL = imageURL;
+	}
 	
 }

@@ -1,19 +1,24 @@
 package com.fido.service;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.fido.entity.DeviceEntity;
 import com.fido.entity.UserEntity;
 import com.fido.model.Device;
+import com.fido.model.Login;
 import com.fido.model.User;
 import com.fido.repository.UserRepository;
+import com.fido.exceptionhandler.AuthenticationFailedException;
 
 
 @Service
@@ -31,6 +36,10 @@ public class UserService {
 	@Autowired
 	private UserRepository userRepository;
 	
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+	
 	/**
 	 * Save user to DB
 	 * @param user
@@ -38,7 +47,19 @@ public class UserService {
 	 */
 	public User createUser(User user)
 	{
-		System.out.println(user.getName()+ " "+ user.getUserPhoneNo()+ " "+ user.getPassword());
+		
+		
+		System.out.println(user.getEmail());
+		List<UserEntity> userEntities = this.userRepository.findByEmail(user.getEmail()); 
+		if(!userEntities.isEmpty())
+		{
+			System.out.println(userEntities.get(0).getId());
+			throw new EntityExistsException("Email ID already registered");
+		}
+		String encodedPassword = this.encodePassword(user.getPassword());
+		
+		user.setPassword(encodedPassword);
+		
 		UserEntity userEntity = this.modelMapper.map(user, UserEntity.class);
 		System.out.println(userEntity.getName()+ " "+ userEntity.getUserPhoneNo()+ " "+ userEntity.getPassword());
 		userEntity = this.userRepository.save(userEntity);
@@ -137,5 +158,36 @@ public class UserService {
 		this.userRepository.delete(userEntity);	
 		return Boolean.TRUE;
 	}
+	
+	
+	/**
+	 * Login 
+	 * @param login
+	 * @return
+	 */
+	public User login (Login login)
+	{
+		List <UserEntity> userEntities = this.userRepository.findByEmail(login.getUsername());
+		if (userEntities.isEmpty())
+		{
+			throw new EntityNotFoundException(login.getUsername());
+		}
+		if(passwordEncoder.matches(login.getPassword(), userEntities.get(0).getPassword()))
+		{
+			return this.modelMapper.map(userEntities.get(0), User.class);
+		}
+		
+		throw new AuthenticationFailedException("Invalid username or password");
+	}
 
+	
+	/**
+	 * Encode password
+	 * @param password
+	 * @return
+	 */
+	private String encodePassword(String password)
+	{
+		return this.passwordEncoder.encode(password);
+	}
 }
