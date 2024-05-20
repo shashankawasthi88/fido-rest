@@ -19,7 +19,18 @@ public class LocationEntity {
 	/**
 	 * Latitude and longitude data
 	 */
-	private String location;
+	//private String location;
+	
+	/**
+	 * Latitude
+	 */
+	private double latitude;
+	
+	
+	/**
+	 * Longitude
+	 */
+	private double longitude;
 	
 	/**
 	 * IMEI of the device
@@ -44,20 +55,6 @@ public class LocationEntity {
 	 */
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	/**
-	 * @return the location
-	 */
-	public String getLocation() {
-		return location;
-	}
-
-	/**
-	 * @param location the location to set
-	 */
-	public void setLocation(String location) {
-		this.location = location;
 	}
 
 	/**
@@ -87,6 +84,36 @@ public class LocationEntity {
 	public void setTimestamp(Date timestamp) {
 		this.timestamp = timestamp;
 	}
+
+	/**
+	 * @return the latitude
+	 */
+	public double getLatitude() {
+		return latitude;
+	}
+
+	/**
+	 * @param latitude the latitude to set
+	 */
+	public void setLatitude(double latitude) {
+		this.latitude = latitude;
+	}
+
+	/**
+	 * @return the longitude
+	 */
+	public double getLongitude() {
+		return longitude;
+	}
+
+	/**
+	 * @param longitude the longitude to set
+	 */
+	public void setLongitude(double longitude) {
+		this.longitude = longitude;
+	}
+	
+	
 	
 
 }

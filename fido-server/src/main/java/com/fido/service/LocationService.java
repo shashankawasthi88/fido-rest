@@ -1,5 +1,7 @@
 package com.fido.service;
 
+import java.util.List;
+
 import javax.persistence.EntityNotFoundException;
 
 import org.modelmapper.ModelMapper;
@@ -39,6 +41,22 @@ public class LocationService {
 			throw new EntityNotFoundException(id.toString());
 		}
 		return this.modelMapper.map(locationEntity, Location.class);
+	}
+	
+	
+	public Location getLocation(String imei)
+	{
+		List <LocationEntity> locationEntities = this.locationRepository.findByImei(imei);
+		
+		if (locationEntities.isEmpty())
+		{
+			throw new EntityNotFoundException("No location found for imei :" + imei);
+			
+		}
+		LocationEntity locationEntity = locationEntities.get(0);
+		
+		return this.modelMapper.map(locationEntity, Location.class);
+		
 	}
 	
 	public Location updateLocation(Location location)

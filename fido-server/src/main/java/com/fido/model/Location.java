@@ -2,18 +2,22 @@ package com.fido.model;
 
 import java.util.Date;
 
-
-
 public class Location {
-	
-	
-private Long id;
-	
-	
-	private String location;
-	
+
+	private Long id;
+
+	/**
+	 * Latitude
+	 */
+	private double latitude;
+
+	/**
+	 * Longitude
+	 */
+	private double longitude;
+
 	private String imei;
-	
+
 	/**
 	 * Date and time
 	 */
@@ -33,18 +37,34 @@ private Long id;
 		this.id = id;
 	}
 
+	
+
 	/**
-	 * @return the location
+	 * @return the latitude
 	 */
-	public String getLocation() {
-		return location;
+	public double getLatitude() {
+		return latitude;
 	}
 
 	/**
-	 * @param location the location to set
+	 * @param latitude the latitude to set
 	 */
-	public void setLocation(String location) {
-		this.location = location;
+	public void setLatitude(double latitude) {
+		this.latitude = latitude;
+	}
+
+	/**
+	 * @return the longitude
+	 */
+	public double getLongitude() {
+		return longitude;
+	}
+
+	/**
+	 * @param longitude the longitude to set
+	 */
+	public void setLongitude(double longitude) {
+		this.longitude = longitude;
 	}
 
 	/**
@@ -74,8 +94,5 @@ private Long id;
 	public void setTimestamp(Date timestamp) {
 		this.timestamp = timestamp;
 	}
-	
-	
-	
 
 }
