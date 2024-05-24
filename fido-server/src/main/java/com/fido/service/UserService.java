@@ -106,11 +106,20 @@ public class UserService {
 	public User updateUser(User user)
 	{
 		UserEntity userEntity = this.userRepository.findById(user.getId()).orElse(null);
+		
+		
+		
 		if (userEntity == null)
 		{
 			throw new EntityNotFoundException(user.getId().toString());
 		}
+		
+		System.out.println("Get Device Entities 1" + userEntity.getDeviceEntities());
+		
 		userEntity = this.modelMapper.map(user, UserEntity.class);
+		
+		
+		// This should not be allowed. For updating the device, user should call the device APIs.
 		// Handle devices if added to the user
 		if(user.getDevices()!= null && !user.getDevices().isEmpty())
 		{
@@ -122,17 +131,27 @@ public class UserService {
 				deviceEntities.add(deviceEntity);
 			}
 		}
+		
+		
 		userEntity = this.userRepository.save(userEntity);
+		
+		//UserEntity userEntity1 = this.userRepository.findById(user.getId()).orElse(null);
+		
 		
 		user = this.modelMapper.map(userEntity, User.class);
 		
+		// -------------FIX THIS------------------- The device entity is not being returned at this stage somehow
 		// re add devices if added to the user
+		//System.out.println("Get Device Entities" + userEntity1.getDeviceEntities());
+		
 		if (userEntity.getDeviceEntities()!=null && !userEntity.getDeviceEntities().isEmpty())
 		{
+			System.out.println("Adding devices back");
 			Set<Device> devices = new HashSet<Device>();
 			user.setDevices(devices);
 			for (DeviceEntity deviceEntity: userEntity.getDeviceEntities())
 			{
+				System.out.println("Device ID :" + deviceEntity.getId());
 				Device device = this.modelMapper.map(deviceEntity, Device.class);
 				devices.add(device);
 			}
