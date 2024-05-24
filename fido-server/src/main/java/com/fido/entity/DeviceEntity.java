@@ -21,6 +21,17 @@ public class DeviceEntity {
 	@ManyToOne
 	@JoinColumn (name = "user_id")
 	private UserEntity userEntity;
+	
+	
+	/**
+	 * The ID retrieved from remote servers
+	 */
+	private Long deviceExternalId;
+	
+	/**
+	 * Device name
+	 */
+	private String deviceName;
 
 	/**
 	 * @return the id
@@ -78,4 +89,31 @@ public class DeviceEntity {
 		this.userEntity = userEntity;
 	}
 
+	/**
+	 * @return the deviceName
+	 */
+	public String getDeviceName() {
+		return deviceName;
+	}
+
+	/**
+	 * @param deviceName the deviceName to set
+	 */
+	public void setDeviceName(String deviceName) {
+		this.deviceName = deviceName;
+	}
+
+	/**
+	 * @return the deviceExternalId
+	 */
+	public Long getDeviceExternalId() {
+		return deviceExternalId;
+	}
+
+	/**
+	 * @param deviceExternalId the deviceExternalId to set
+	 */
+	public void setDeviceExternalId(Long deviceExternalId) {
+		this.deviceExternalId = deviceExternalId;
+	}
 }

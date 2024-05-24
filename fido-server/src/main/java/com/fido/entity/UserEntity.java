@@ -36,6 +36,11 @@ public class UserEntity {
 	 */
 	private String imageURL;
 	
+	/**
+	 * ID from the external system
+	 */
+	private long userExternalId;
+	
 	@OneToMany (mappedBy = "userEntity", cascade = CascadeType.ALL)
 	private Set<DeviceEntity> deviceEntities;
 
@@ -149,6 +154,22 @@ public class UserEntity {
 	 */
 	public void setImageURL(String imageURL) {
 		this.imageURL = imageURL;
+	}
+
+
+	/**
+	 * @return the userExternalId
+	 */
+	public long getUserExternalId() {
+		return userExternalId;
+	}
+
+
+	/**
+	 * @param userExternalId the userExternalId to set
+	 */
+	public void setUserExternalId(long userExternalId) {
+		this.userExternalId = userExternalId;
 	}
 	
 }

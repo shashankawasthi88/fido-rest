@@ -38,6 +38,11 @@ public class User {
 	
 	
 	private Set<Device> devices;
+	
+	/**
+	 * ID from the external system
+	 */
+	private long userExternalId;
 
 	/**
 	 * @return the id
@@ -136,6 +141,21 @@ public class User {
 	public void setImageURL(String imageURL) {
 		this.imageURL = imageURL;
 	}
+
+	/**
+	 * @return the userExternalId
+	 */
+	public long getUserExternalId() {
+		return userExternalId;
+	}
+
+	/**
+	 * @param userExternalId the userExternalId to set
+	 */
+	public void setUserExternalId(long userExternalId) {
+		this.userExternalId = userExternalId;
+	}
+	
 	
 	
 }
