@@ -16,7 +16,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fido.model.Device;
 import com.fido.model.Location;
 import com.fido.model.User;
-import com.fido.service.UserService;
+import com.fido.service.internal.UserService;
 import com.fido.wsclient.OpenAPIV4Locator;
 import com.fido.wsclient.OpenAPIV4Soap;
 
@@ -62,6 +62,7 @@ public class FidoExternalService {
 	 * 
 	 * @param user
 	 * @return
+	 * @throws RemoteException 
 	 * @throws IOException
 	 */
 	public User createUserandDevice(User user) throws IOException {
@@ -72,10 +73,15 @@ public class FidoExternalService {
 		}
 		Device device = user.getDevices().iterator().next();
 
-		String response = openAPIV4Soap.userRegister(device.getImei(), user.getEmail(), user.getPassword(),
+		String response = openAPIV4Soap.userRegister(device.getImei(), user.getEmail(), "1234",
 				user.getUserPhoneNo(), device.getDeviceName(), 0);
 
+		System.out.println("Response from the server for registration" + response);
+		
+			
+		
 		JsonNode rootNode = objectMapper.readTree(response);
+		
 		JsonNode stateNode = rootNode.path(state);
 
 		if (!stateNode.isMissingNode()) {
@@ -85,11 +91,15 @@ public class FidoExternalService {
 				// Handle state "0"
 				System.out.println("State is 0, taking appropriate action.");
 				// login to get the User ID
-				response = openAPIV4Soap.login(user.getEmail(), user.getPassword(), 0);
+				response = openAPIV4Soap.login(user.getEmail(), "1234" , 0);
+				System.out.println("Response from the server for login" + response);
 
 				rootNode = objectMapper.readTree(response);
-				JsonNode nodeUserID = rootNode.path(userID);
+				System.out.println("root node" +rootNode);
+				JsonNode nodeUserID = rootNode.path("userInfo").path(userID);
+				System.out.println("user id node" +nodeUserID);
 				if (nodeUserID.isMissingNode()) {
+					System.out.println("Response from the server for login" + response+ "User id is missing");
 					throw new RemoteException("Could not login user on remote");
 				}
 				// user.setId(userID.asLong());
@@ -98,6 +108,8 @@ public class FidoExternalService {
 
 				// get device list to get the device ID
 				response = openAPIV4Soap.getDeviceList(nodeUserID.asInt(), 0, google, en);
+				
+				System.out.println("Response from the server for get device list" + response);
 
 				rootNode = objectMapper.readTree(response);
 
@@ -106,20 +118,26 @@ public class FidoExternalService {
 				// Extract the id of the first element in the array
 				if (arrNode.isArray() && arrNode.size() > 0) {
 					JsonNode firstElement = arrNode.get(0);
-					Long deviceId = firstElement.path("id").asLong();
+					Long deviceId = firstElement.path(id).asLong();
 
 					device.setDeviceExternalId(deviceId);
 
 				} else {
+					
+					System.out.println("Response from the server for get device list" + response + "Could not fetch device list");
 					throw new RemoteException("Could not fetch device list on remote");
 				}
 
 			} else {
+				
+				System.out.println("Response from the server for registration" + response + "the state is not 0");
 				throw new RemoteException("Could not create User on remote");
 			}
 		} else {
+			System.out.println("Response from the server for registration" + response+ "There is no state object");
 			throw new RemoteException("Could not create User on remote");
 		}
+		
 		return user;
 	}
 

@@ -10,19 +10,19 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fido.model.User;
-import com.fido.service.UserService;
+import com.fido.service.orchestrator.UserOrchestratorService;
 
 @RestController
 public class UserController {
 	
 	
 	@Autowired
-	private UserService userService;
+	private UserOrchestratorService userOrchestratorService;
 	
 	@PostMapping("/user")
 	public User createUser(@RequestBody User user)
 	{
-		return this.userService.createUser(user);
+		return this.userOrchestratorService.createUser(user);
 		
 	}
 	
@@ -30,20 +30,20 @@ public class UserController {
 	@GetMapping("/user/{id}")
 	public User getUser(@PathVariable Long id)
 	{
-		return this.userService.getUser(id);
+		return this.userOrchestratorService.getUser(id);
 	}
 	
 	
 	@PutMapping("/user")
 	public User updateUser(@RequestBody User user)
 	{
-		return this.userService.updateUser(user);
+		return this.userOrchestratorService.updateUser(user);
 	}
 	
 	@DeleteMapping("/user/{id}")
 	public Boolean deleteUser(@PathVariable Long id)
 	{
-		return this.userService.deleteUser(id);
+		return this.userOrchestratorService.deleteUser(id);
 	}
 	
 	

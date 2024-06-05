@@ -27,6 +27,7 @@ public static void main(String[] args) {
 	
 	@Bean
     public PasswordEncoder passwordEncoder() {
+		
         return new BCryptPasswordEncoder();
     }
 	
