@@ -59,7 +59,7 @@ public class DeviceIOrchestratorService {
 			try {
 				user = this.externalService.createUserandDevice(user);
 			} catch (IOException e) {
-				
+
 				e.printStackTrace();
 				throw new ExternalCallException("Could not create new user on external server");
 			}
@@ -73,7 +73,7 @@ public class DeviceIOrchestratorService {
 				device = this.externalService.addDevice(device);
 			} catch (IOException e) {
 
-				throw new ExternalCallException("Could not create new device on external server");
+				throw new ExternalCallException(e.getMessage());
 			}
 			return this.deviceService.createDevice(device);
 		}
@@ -88,7 +88,20 @@ public class DeviceIOrchestratorService {
 	}
 
 	public Boolean deleteDevice(Long id) {
-		return this.deviceService.deleteDevice(id);
+		
+		Device device = this.deviceService.getDevice(id);
+
+		User user = this.userService.getUser(device.getUserId());
+		
+		boolean isDeleted = false;
+		try {
+			isDeleted = this.externalService.deleteDevice(device.getDeviceExternalId(), user.getUserExternalId());
+		} catch (IOException e) {
+			throw new ExternalCallException(e.getMessage());
+		}
+
+		return isDeleted;
+		
 	}
 
 }

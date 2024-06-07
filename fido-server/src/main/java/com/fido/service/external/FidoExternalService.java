@@ -153,6 +153,7 @@ public class FidoExternalService {
 
 		String response = openAPIV4Soap.addDevice(device.getImei(), device.getDeviceName(), 0,
 				device.getDevicePhoneNo(), (int) user.getUserExternalId(), 0);
+		System.out.println("Response from the add device call" + response);
 
 		JsonNode rootNode = objectMapper.readTree(response);
 		JsonNode stateNode = rootNode.path(state);
@@ -164,31 +165,43 @@ public class FidoExternalService {
 				// Device added successfully, get the device ID
 				
 				response = openAPIV4Soap.getDeviceList((int)user.getUserExternalId(), 0, google, en);
+				System.out.println("Response from the get device list call" + response);
 				rootNode = objectMapper.readTree(response);
 				JsonNode arrNode = rootNode.path("arr");
 				
+				System.out.println("Array of devices" + arrNode);
 				// Iterate through the array to find the matching 'sn'
 	            if (arrNode.isArray()) {
 	                for (JsonNode element : arrNode) {
 	                    String elementSn = element.path("sn").asText();
 	                    if (device.getImei().equals(elementSn)) {
 	                    	
+	                    	System.out.println("Found the newley registered device in the device list array, adding its external ID ");
+	                    	
 	                    	device.setDeviceExternalId(element.path(id).asLong());
 	  
 	                    }
 	                }
 	            }
+	            else 
+	            {
+	            	throw new RemoteException("Device registration passed, but device array is empty in device list");
+	            	
+	            }
 			}
 			else if ("1002".equals(state))
 			{
+				System.out.println("registrtation failed with" + state);
 				throw new RemoteException("Device registration failed");
 			}
 			else if ("1008".equals(state))
 			{
+				System.out.println("registrtation failed with" + state);
 				throw new RemoteException("Device IMEI already registered");
 			}
 			else if ("1007".equals(state))
 			{
+				System.out.println("registrtation failed with" + state);
 				throw new RemoteException("Device IMEI does not exist");
 			}
 		}
@@ -240,6 +253,38 @@ public class FidoExternalService {
         else {
         	throw new RemoteException("Could not fetch the location");
         }
+	}
+	
+	
+	/**
+	 * Delete the device from remote server - transfer to superior
+	 * @param device
+	 * @return
+	 * @throws IOException 
+	 */
+	public boolean deleteDevice (long extDeviceId, long extUserId) throws IOException
+	{
+		try {
+			String response = openAPIV4Soap.transferToSuperior((int) extDeviceId, (int)extUserId, en);
+			
+			JsonNode rootNode = objectMapper.readTree(response);
+
+	        if ("0".equals(rootNode.path(state).asText())) {
+	        	
+	        	System.out.println("Device successfully deleted from remote");
+	        	return true;
+	        }
+	        else 
+	        {
+	        	System.out.println("Device could not be deleted from remote");
+	        	
+	        	throw new RemoteException("Could not delte the device from remote server");
+	        }
+			
+		} catch (RemoteException e) {
+			e.printStackTrace();
+			throw new RemoteException("Could not delte the device from remote server");
+		}
 	}
 
 }
