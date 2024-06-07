@@ -100,7 +100,16 @@ public class DeviceIOrchestratorService {
 			throw new ExternalCallException(e.getMessage());
 		}
 
-		return isDeleted;
+		if (isDeleted)
+		{
+			// Delete from local
+			return this.deviceService.deleteDevice(id);
+		}
+		else 
+		{
+			throw new ExternalCallException("Device could not be deleted from the server");
+			
+		}
 		
 	}
 
