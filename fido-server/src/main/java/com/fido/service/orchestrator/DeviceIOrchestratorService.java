@@ -61,7 +61,7 @@ public class DeviceIOrchestratorService {
 			} catch (IOException e) {
 
 				e.printStackTrace();
-				throw new ExternalCallException("Could not create new user on external server");
+				throw new ExternalCallException(e.getMessage());
 			}
 			user = this.userService.updateUser(user);
 			// return the device created

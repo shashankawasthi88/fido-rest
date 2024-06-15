@@ -16,12 +16,20 @@ public class Location {
 	 */
 	private double longitude;
 
+	/**
+	 * IMEI of the device
+	 */
 	private String imei;
 
 	/**
 	 * Date and time
 	 */
 	private Date timestamp;
+	
+	/**
+	 * Time in millis
+	 */
+	private long longTimeStamp;
 
 	/**
 	 * @return the id
@@ -94,5 +102,21 @@ public class Location {
 	public void setTimestamp(Date timestamp) {
 		this.timestamp = timestamp;
 	}
+
+	/**
+	 * @return the longTimeStamp
+	 */
+	public long getLongTimeStamp() {
+		return longTimeStamp;
+	}
+
+	/**
+	 * @param longTimeStamp the longTimeStamp to set
+	 */
+	public void setLongTimeStamp(long longTimeStamp) {
+		this.longTimeStamp = longTimeStamp;
+	}
+	
+	
 
 }

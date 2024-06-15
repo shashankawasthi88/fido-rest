@@ -38,6 +38,12 @@ public class FidoExternalService {
 	private static final String en = "EN";
 	
 	private double timezone = 5.50;
+	
+	private static final String lastCommunication = "lastCommunication";
+	
+	private static final String latitude = "latitude";
+	
+	private static final String longitude = "longitude";
 
 	@Autowired
 	private UserService userService;
@@ -128,9 +134,25 @@ public class FidoExternalService {
 					throw new RemoteException("Could not fetch device list on remote");
 				}
 
-			} else {
+			}
+			else if ("1008".equals(state))
+			{
+				System.out.println("registrtation failed with" + state);
+				throw new RemoteException("Device IMEI already registered");
+			}
+			else if ("1007".equals(state))
+			{
+				System.out.println("registrtation failed with" + state);
+				throw new RemoteException("Device IMEI is invalid");
+			}
+			else if ("1006".equals(state))
+			{
+				System.out.println("registrtation failed with" + state);
+				throw new RemoteException("Email is already registered");
+			}
+			else {
 				
-				System.out.println("Response from the server for registration" + response + "the state is not 0");
+				System.out.println("Response from the server for registration " + response + "the state is not 0");
 				throw new RemoteException("Could not create User on remote");
 			}
 		} else {
@@ -223,18 +245,23 @@ public class FidoExternalService {
 	{
 		String response = openAPIV4Soap.getTracking(device.getDeviceExternalId().intValue(), timezone, google, en);
 		
+		System.out.println("Response from the get tracking call" + response);
+		
 		JsonNode rootNode = objectMapper.readTree(response);
 
         if ("0".equals(rootNode.path(state).asText())) {
             // Extract latitude and longitude
-            Double latitude = rootNode.path("latitude").asDouble();
-            Double longitude = rootNode.path("longitude").asDouble();
+            Double lt = rootNode.path(latitude).asDouble();
+            Double lo = rootNode.path(longitude).asDouble();
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
             
             Date timestamp= new Date();
+            Long millis = null;
 			try {
-				timestamp = dateFormat.parse((rootNode.path("deviceUtcDate").asText()));
+				timestamp = dateFormat.parse((rootNode.path(lastCommunication).asText()));
+				millis = timestamp.getTime();
 			} catch (ParseException e) {
+				System.out.println("Issue in parsing date in get tracking call");
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -242,15 +269,16 @@ public class FidoExternalService {
             Location location = new Location();
             
             location.setImei(device.getImei());
-            location.setLatitude(latitude);
-            location.setLongitude(longitude);
+            location.setLatitude(lt);
+            location.setLongitude(lo);
             location.setTimestamp(timestamp);
-            
+            location.setLongTimeStamp(millis);
             return location;
             
             
         }
         else {
+        	System.out.println("Response from the get tracking call is not state 0 :" + response);
         	throw new RemoteException("Could not fetch the location");
         }
 	}
