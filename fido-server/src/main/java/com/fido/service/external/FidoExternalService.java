@@ -254,6 +254,7 @@ public class FidoExternalService {
             Double lt = rootNode.path(latitude).asDouble();
             Double lo = rootNode.path(longitude).asDouble();
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
+            // dateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Kolkata"));
             
             Date timestamp= new Date();
             Long millis = null;

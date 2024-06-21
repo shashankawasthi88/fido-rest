@@ -23,6 +23,18 @@ public class Device {
 	 * Device name
 	 */
 	private String deviceName;
+	
+	
+	/**
+	 * Daily distance moved by the pet
+	 */
+	private int dailyDistanceMovement = 0;
+	
+	
+	/**
+	 * Daily active time
+	 */
+	private int dailyActivityTime = 0;
 
 
 	/**
@@ -120,6 +132,36 @@ public class Device {
 		this.deviceExternalId = deviceExternalId;
 	}
 
-	
+
+	/**
+	 * @return the dailyDistanceMovement
+	 */
+	public int getDailyDistanceMovement() {
+		return dailyDistanceMovement;
+	}
+
+
+	/**
+	 * @param dailyDistanceMovement the dailyDistanceMovement to set
+	 */
+	public void setDailyDistanceMovement(int dailyDistanceMovement) {
+		this.dailyDistanceMovement = dailyDistanceMovement;
+	}
+
+
+	/**
+	 * @return the dailyActivityTime
+	 */
+	public int getDailyActivityTime() {
+		return dailyActivityTime;
+	}
+
+
+	/**
+	 * @param dailyActivityTime the dailyActivityTime to set
+	 */
+	public void setDailyActivityTime(int dailyActivityTime) {
+		this.dailyActivityTime = dailyActivityTime;
+	}	
 	
 }
