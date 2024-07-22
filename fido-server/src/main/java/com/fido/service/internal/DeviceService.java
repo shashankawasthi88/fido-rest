@@ -1,5 +1,8 @@
 package com.fido.service.internal;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import javax.persistence.EntityNotFoundException;
 
 import org.modelmapper.ModelMapper;
@@ -83,4 +86,28 @@ public class DeviceService {
 		return Boolean.TRUE;
 	}
 
+	
+	
+	/**
+	 * Get all devices
+	 * @return
+	 */
+	public List<Device> getDevices()
+	{
+		
+		List<DeviceEntity> deviceEntities = this.deviceRepository.findAll();
+		if (deviceEntities == null || deviceEntities.isEmpty())
+		{
+			return null;
+		}
+		List<Device> devices = new LinkedList<Device>();
+		
+		for (DeviceEntity deviceEntity : deviceEntities)
+		{
+			Device device = this.modelMapper.map(deviceEntity, Device.class);
+			device.setUserId(deviceEntity.getUserEntity().getId());
+			devices.add(device);
+		}
+		return devices;
+	}
 }

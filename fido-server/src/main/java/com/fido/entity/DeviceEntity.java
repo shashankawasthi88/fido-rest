@@ -32,6 +32,18 @@ public class DeviceEntity {
 	 * Device name
 	 */
 	private String deviceName;
+	
+	/**
+	 * Daily distance moved by the pet
+	 */
+	private double dailyDistanceMovement;
+	
+	
+	/**
+	 * Daily active time
+	 */
+	private double dailyActivityTime;
+	
 
 	/**
 	 * @return the id
@@ -116,4 +128,33 @@ public class DeviceEntity {
 	public void setDeviceExternalId(Long deviceExternalId) {
 		this.deviceExternalId = deviceExternalId;
 	}
+
+	/**
+	 * @return the dailyDistanceMovement
+	 */
+	public double getDailyDistanceMovement() {
+		return dailyDistanceMovement;
+	}
+
+	/**
+	 * @param dailyDistanceMovement the dailyDistanceMovement to set
+	 */
+	public void setDailyDistanceMovement(double dailyDistanceMovement) {
+		this.dailyDistanceMovement = dailyDistanceMovement;
+	}
+
+	/**
+	 * @return the dailyActivityTime
+	 */
+	public double getDailyActivityTime() {
+		return dailyActivityTime;
+	}
+
+	/**
+	 * @param dailyActivityTime the dailyActivityTime to set
+	 */
+	public void setDailyActivityTime(double dailyActivityTime) {
+		this.dailyActivityTime = dailyActivityTime;
+	}
+	
 }
