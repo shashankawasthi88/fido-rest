@@ -91,8 +91,6 @@ public class UserService {
 			for( DeviceEntity deviceEntity: userEntity.getDeviceEntities())
 			{
 				Device device = this.modelMapper.map(deviceEntity, Device.class);
-				device.setDailyActivityTime(6.5);
-				device.setDailyDistanceMovement(1500.8);
 				devices.add(device);
 			}
 		}
