@@ -18,7 +18,7 @@ public class ScheduledExternalCall {
 	
 	//@Scheduled(fixedRate = 3600000) // 3600000 milliseconds = 1 hour
 	//@Scheduled(fixedRate = 5000)
-	@Scheduled(fixedRate = 7200000) // 3600000 milliseconds = 1 hour
+	//@Scheduled(fixedRate = 7200000) // 3600000 milliseconds = 1 hour
 	public void getDistanceAndTimeAggregates()
 	{
 		try {

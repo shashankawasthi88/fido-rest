@@ -4,9 +4,12 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.rpc.ServiceException;
 
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fido.model.AdditionalProperty;
 import com.fido.model.Device;
 import com.fido.model.Location;
 import com.fido.model.User;
@@ -47,6 +51,8 @@ public class FidoExternalService {
 	private static final String latitude = "latitude";
 
 	private static final String longitude = "longitude";
+	
+	private static final String battery = "Battery";
 
 	@Autowired
 	private UserService userService;
@@ -245,6 +251,8 @@ public class FidoExternalService {
 			Double lo = rootNode.path(longitude).asDouble();
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			// dateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Kolkata"));
+			
+			String bttry = rootNode.path(battery).asText();
 
 			Date timestamp = new Date();
 			Long millis = null;
@@ -264,6 +272,12 @@ public class FidoExternalService {
 			location.setLongitude(lo);
 			location.setTimestamp(timestamp);
 			location.setLongTimeStamp(millis);
+			AdditionalProperty additionalProperty = new AdditionalProperty();
+			additionalProperty.setKey(battery);
+			additionalProperty.setValue(bttry+"%");
+			List<AdditionalProperty> additionalProperties = new ArrayList<AdditionalProperty>();
+			additionalProperties.add(additionalProperty);
+			location.setAdditionalProperties(additionalProperties);
 			return location;
 
 		} else {

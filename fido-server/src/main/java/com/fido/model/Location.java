@@ -1,6 +1,8 @@
 package com.fido.model;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public class Location {
 
@@ -30,6 +32,9 @@ public class Location {
 	 * Time in millis
 	 */
 	private long longTimeStamp;
+	
+	
+	private List<AdditionalProperty> additionalProperties;
 
 	/**
 	 * @return the id
@@ -116,7 +121,20 @@ public class Location {
 	public void setLongTimeStamp(long longTimeStamp) {
 		this.longTimeStamp = longTimeStamp;
 	}
-	
-	
 
+	/**
+	 * @return the additionalProperties
+	 */
+	public List<AdditionalProperty> getAdditionalProperties() {
+		return additionalProperties;
+	}
+
+	/**
+	 * @param additionalProperties the additionalProperties to set
+	 */
+	public void setAdditionalProperties(List<AdditionalProperty> additionalProperties) {
+		this.additionalProperties = additionalProperties;
+	}
+	
+	
 }
