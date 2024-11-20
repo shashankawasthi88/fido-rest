@@ -2,7 +2,6 @@ package com.fido.model;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 public class Location {
 
@@ -35,6 +34,9 @@ public class Location {
 	
 	
 	private List<AdditionalProperty> additionalProperties;
+	
+	
+	private double batteryPercentage;
 
 	/**
 	 * @return the id
@@ -135,6 +137,22 @@ public class Location {
 	public void setAdditionalProperties(List<AdditionalProperty> additionalProperties) {
 		this.additionalProperties = additionalProperties;
 	}
+
+	/**
+	 * @return the batteryPercentage
+	 */
+	public double getBatteryPercentage() {
+		return batteryPercentage;
+	}
+
+	/**
+	 * @param batteryPercentage the batteryPercentage to set
+	 */
+	public void setBatteryPercentage(double batteryPercentage) {
+		this.batteryPercentage = batteryPercentage;
+	}
+	
+	
 	
 	
 }

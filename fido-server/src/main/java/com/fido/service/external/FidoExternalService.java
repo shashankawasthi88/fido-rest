@@ -252,7 +252,7 @@ public class FidoExternalService {
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			// dateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Kolkata"));
 			
-			String bttry = rootNode.path(battery).asText();
+			Double bttry = rootNode.path(battery).asDouble();
 
 			Date timestamp = new Date();
 			Long millis = null;
@@ -272,12 +272,13 @@ public class FidoExternalService {
 			location.setLongitude(lo);
 			location.setTimestamp(timestamp);
 			location.setLongTimeStamp(millis);
-			AdditionalProperty additionalProperty = new AdditionalProperty();
-			additionalProperty.setKey(battery);
-			additionalProperty.setValue(bttry+"%");
-			List<AdditionalProperty> additionalProperties = new ArrayList<AdditionalProperty>();
-			additionalProperties.add(additionalProperty);
-			location.setAdditionalProperties(additionalProperties);
+			//AdditionalProperty additionalProperty = new AdditionalProperty();
+			//additionalProperty.setKey(battery);
+			//additionalProperty.setValue(bttry+"%");
+			//List<AdditionalProperty> additionalProperties = new ArrayList<AdditionalProperty>();
+			//additionalProperties.add(additionalProperty);
+			//location.setAdditionalProperties(additionalProperties);
+			location.setBatteryPercentage(bttry);
 			return location;
 
 		} else {
