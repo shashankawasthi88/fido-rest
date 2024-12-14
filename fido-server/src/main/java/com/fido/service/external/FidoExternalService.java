@@ -53,6 +53,8 @@ public class FidoExternalService {
 	private static final String longitude = "longitude";
 	
 	private static final String battery = "Battery";
+	
+	private static final String distance = "distance";
 
 	@Autowired
 	private UserService userService;
@@ -253,6 +255,9 @@ public class FidoExternalService {
 			// dateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Kolkata"));
 			
 			Double bttry = rootNode.path(battery).asDouble();
+			
+			// Get distance
+			Double dist = rootNode.path(distance).asDouble()/1000;
 
 			Date timestamp = new Date();
 			Long millis = null;
@@ -272,12 +277,13 @@ public class FidoExternalService {
 			location.setLongitude(lo);
 			location.setTimestamp(timestamp);
 			location.setLongTimeStamp(millis);
-			//AdditionalProperty additionalProperty = new AdditionalProperty();
-			//additionalProperty.setKey(battery);
-			//additionalProperty.setValue(bttry+"%");
-			//List<AdditionalProperty> additionalProperties = new ArrayList<AdditionalProperty>();
-			//additionalProperties.add(additionalProperty);
-			//location.setAdditionalProperties(additionalProperties);
+			// Setting total distance in the additional properties
+			AdditionalProperty additionalProperty = new AdditionalProperty();
+			additionalProperty.setKey("Total Distance");
+			additionalProperty.setValue(dist+" km");
+			List<AdditionalProperty> additionalProperties = new ArrayList<AdditionalProperty>();
+			additionalProperties.add(additionalProperty);
+			location.setAdditionalProperties(additionalProperties);
 			location.setBatteryPercentage(bttry);
 			return location;
 
