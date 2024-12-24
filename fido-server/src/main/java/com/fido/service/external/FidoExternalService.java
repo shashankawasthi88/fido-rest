@@ -4,12 +4,12 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.rpc.ServiceException;
 
@@ -51,9 +51,9 @@ public class FidoExternalService {
 	private static final String latitude = "latitude";
 
 	private static final String longitude = "longitude";
-	
+
 	private static final String battery = "Battery";
-	
+
 	private static final String distance = "distance";
 
 	@Autowired
@@ -253,11 +253,15 @@ public class FidoExternalService {
 			Double lo = rootNode.path(longitude).asDouble();
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			// dateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Kolkata"));
-			
+
 			Double bttry = rootNode.path(battery).asDouble();
-			
+
+			// TODO Update the distance logic
+
 			// Get distance
-			Double dist = rootNode.path(distance).asDouble()/1000;
+			// Double dist = rootNode.path(distance).asDouble()/1000;
+			
+			Double dist = this.getDistanceDetails(device);
 
 			Date timestamp = new Date();
 			Long millis = null;
@@ -279,8 +283,8 @@ public class FidoExternalService {
 			location.setLongTimeStamp(millis);
 			// Setting total distance in the additional properties
 			AdditionalProperty additionalProperty = new AdditionalProperty();
-			additionalProperty.setKey("Total Distance");
-			additionalProperty.setValue(dist+" km");
+			additionalProperty.setKey("Daily Distance");
+			additionalProperty.setValue(dist + " km");
 			List<AdditionalProperty> additionalProperties = new ArrayList<AdditionalProperty>();
 			additionalProperties.add(additionalProperty);
 			location.setAdditionalProperties(additionalProperties);
@@ -328,7 +332,7 @@ public class FidoExternalService {
 	 * @throws IOException
 	 */
 	public void getActivityDetails() throws IOException {
-		
+
 		System.out.println("getActivityDetails : This is running at a constant rate");
 
 		Calendar calendar = Calendar.getInstance();
@@ -343,15 +347,18 @@ public class FidoExternalService {
 			double aggregateTime = 0.0;
 			try {
 
-				System.out.println(device.getDeviceExternalId().intValue() + "0" +
-						String.valueOf(calendar.get(Calendar.HOUR_OF_DAY))+":00" + timezone + "1" + google + "10" + en);
-				
+				System.out.println(device.getDeviceExternalId().intValue() + "0"
+						+ String.valueOf(calendar.get(Calendar.HOUR_OF_DAY)) + ":00" + timezone + "1" + google + "10"
+						+ en);
+
 				String response = openAPIV4Soap.getDevicesHistory(device.getDeviceExternalId().intValue(), "0",
-						String.valueOf(calendar.get(Calendar.HOUR_OF_DAY))+":00", timezone, 1, google, 10, en);
-				System.out.println("Response for get History call for external Device ID :" + device.getDeviceExternalId() + " :" + response);
+						String.valueOf(calendar.get(Calendar.HOUR_OF_DAY)) + ":00", timezone, 1, google, 10, en);
+				System.out.println("Response for get History call for external Device ID :"
+						+ device.getDeviceExternalId() + " :" + response);
 
 				JsonNode rootNode = objectMapper.readTree(response);
-				//System.out.println("Response for get History call for external Device ID :" + device.getDeviceExternalId() + " :" + response);
+				// System.out.println("Response for get History call for external Device ID :" +
+				// device.getDeviceExternalId() + " :" + response);
 				if ("0".equals(rootNode.path(state).asText())) {
 
 					JsonNode extDevices = rootNode.get("devices");
@@ -365,16 +372,17 @@ public class FidoExternalService {
 					}
 
 					device.setDailyDistanceMovement(aggregateDistance);
-					// Find activity period by subtracting current time in minutes with inactivity period
+					// Find activity period by subtracting current time in minutes with inactivity
+					// period
 					Double activityTime = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE)
 							- aggregateTime;
 					device.setDailyActivityTime(activityTime);
 					System.out.println("Distance from the external service for extDevice: "
 							+ device.getDeviceExternalId() + " :" + aggregateDistance);
-					
+
 					System.out.println("Activity time from the external service for extDevice: "
 							+ device.getDeviceExternalId() + " :" + activityTime);
-					
+
 					// Update the device in the database
 					this.deviceService.updateDevice(device);
 				} else {
@@ -390,6 +398,75 @@ public class FidoExternalService {
 			}
 
 		}
+
+	}
+
+	/**
+	 * Fetch distance from the history call
+	 * 
+	 * @return
+	 * @throws IOException
+	 */
+	public double getDistanceDetails(Device device) throws IOException {
+
+		//Calendar calendar = Calendar.getInstance();
+
+		double aggregateDistance = 0.0;
+		
+		try {
+			
+			//String lastOneHour = String.valueOf(calendar.get(Calendar.HOUR_OF_DAY)-1) + ":00";
+			
+			// Get time now 
+			LocalDateTime now = LocalDateTime.now();
+			
+			// Get the time 1 hour before
+	        LocalDateTime oneHourBefore = now.minusHours(1);
+	        
+	     // Define the desired format
+	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd H:mm");
+	        
+	        
+	     // Format the current time and the time 1 hour before
+	        String formattedCurrentTime = now.format(formatter);
+	        String formattedTimeOneHourBefore = oneHourBefore.format(formatter);
+			
+			
+
+			System.out.println(device.getDeviceExternalId().intValue() + "----- "+ formattedTimeOneHourBefore
+					+"-----" + formattedCurrentTime + "----" + timezone +"-----" +"1" +"------" +google + "----"+"5" +"----" +en);
+			
+
+			String response = openAPIV4Soap.getDevicesHistory(device.getDeviceExternalId().intValue(), formattedTimeOneHourBefore,
+					formattedCurrentTime , timezone, 1, google, 5, en);
+			System.out.println("Response for get History call for external Device ID :" + device.getDeviceExternalId()
+					+ " :" + response);
+
+			JsonNode rootNode = objectMapper.readTree(response);
+			if ("0".equals(rootNode.path(state).asText())) {
+
+				JsonNode extDevices = rootNode.get("devices");
+				if (extDevices.isArray()) {
+					for (JsonNode extDevice : extDevices) {
+						aggregateDistance = extDevice.get("distance").asDouble();
+					}
+				}
+				System.out.println("Distance from the external service for extDevice: " + device.getDeviceExternalId()
+						+ " :" + aggregateDistance);
+				return aggregateDistance;
+
+			} else {
+				System.out.println(
+						"Count not find device history for external_deviceId :" + device.getDeviceExternalId());
+
+			}
+
+		} catch (RemoteException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return 0;
 
 	}
 

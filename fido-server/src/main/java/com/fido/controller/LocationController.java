@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fido.model.Location;
-import com.fido.service.internal.LocationService;
 import com.fido.service.orchestrator.LocationOrchestratorService;
 
 @RestController
