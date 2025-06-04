@@ -1,5 +1,6 @@
 package com.fido;
 
+
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityNotFoundException;
 
@@ -10,6 +11,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import com.fido.constants.ErrorCode;
 import com.fido.exceptionhandler.AuthenticationFailedException;
+import com.fido.exceptionhandler.ExternalCallException;
 import com.fido.model.ErrorDetails;
 
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -39,6 +41,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		// You can customize the error message here
 		ErrorDetails errorDetails = new ErrorDetails(ErrorCode.ENTITY_EXISTS, ex.getMessage());
 		return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+	}
+	
+	
+	@ExceptionHandler(ExternalCallException.class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	public ResponseEntity<Object> handleExternalCallException(ExternalCallException ex) {
+		// You can customize the error message here
+		ErrorDetails errorDetails = new ErrorDetails(ErrorCode.EXTERNAL_CALL_EXCEPTION, ex.getMessage());
+		return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 }

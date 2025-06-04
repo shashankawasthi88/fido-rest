@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fido.model.Login;
 import com.fido.model.User;
-import com.fido.service.UserService;
+import com.fido.service.orchestrator.UserOrchestratorService;
 
 @RestController
 public class LoginController {
@@ -15,20 +15,20 @@ public class LoginController {
 	
 	
 	@Autowired
-	private UserService userService;
+	private UserOrchestratorService userOrchestratorService;
 	
 	
 	@PostMapping("/login")
 	public User login(@RequestBody Login login)
 	{
-		return this.userService.login(login);
+		return this.userOrchestratorService.login(login);
 	}
 	
 	
 	@PostMapping("/register")
 	public User register (@RequestBody User user)
 	{
-		return this.userService.createUser(user);
+		return this.userOrchestratorService.createUser(user);
 	}
 	
 

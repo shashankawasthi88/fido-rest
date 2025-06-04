@@ -1,4 +1,4 @@
-package com.fido.service;
+package com.fido.service.internal;
 
 import java.util.HashSet;
 import java.util.List;
@@ -128,6 +128,7 @@ public class UserService {
 			for (Device device: user.getDevices())
 			{
 				DeviceEntity deviceEntity = this.modelMapper.map(device, DeviceEntity.class);
+				deviceEntity.setUserEntity(userEntity);
 				deviceEntities.add(deviceEntity);
 			}
 		}

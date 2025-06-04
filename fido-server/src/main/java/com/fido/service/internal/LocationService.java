@@ -1,4 +1,4 @@
-package com.fido.service;
+package com.fido.service.internal;
 
 import java.util.List;
 

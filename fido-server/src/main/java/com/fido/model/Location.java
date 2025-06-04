@@ -1,6 +1,7 @@
 package com.fido.model;
 
 import java.util.Date;
+import java.util.List;
 
 public class Location {
 
@@ -16,12 +17,26 @@ public class Location {
 	 */
 	private double longitude;
 
+	/**
+	 * IMEI of the device
+	 */
 	private String imei;
 
 	/**
 	 * Date and time
 	 */
 	private Date timestamp;
+	
+	/**
+	 * Time in millis
+	 */
+	private long longTimeStamp;
+	
+	
+	private List<AdditionalProperty> additionalProperties;
+	
+	
+	private double batteryPercentage;
 
 	/**
 	 * @return the id
@@ -95,4 +110,49 @@ public class Location {
 		this.timestamp = timestamp;
 	}
 
+	/**
+	 * @return the longTimeStamp
+	 */
+	public long getLongTimeStamp() {
+		return longTimeStamp;
+	}
+
+	/**
+	 * @param longTimeStamp the longTimeStamp to set
+	 */
+	public void setLongTimeStamp(long longTimeStamp) {
+		this.longTimeStamp = longTimeStamp;
+	}
+
+	/**
+	 * @return the additionalProperties
+	 */
+	public List<AdditionalProperty> getAdditionalProperties() {
+		return additionalProperties;
+	}
+
+	/**
+	 * @param additionalProperties the additionalProperties to set
+	 */
+	public void setAdditionalProperties(List<AdditionalProperty> additionalProperties) {
+		this.additionalProperties = additionalProperties;
+	}
+
+	/**
+	 * @return the batteryPercentage
+	 */
+	public double getBatteryPercentage() {
+		return batteryPercentage;
+	}
+
+	/**
+	 * @param batteryPercentage the batteryPercentage to set
+	 */
+	public void setBatteryPercentage(double batteryPercentage) {
+		this.batteryPercentage = batteryPercentage;
+	}
+	
+	
+	
+	
 }
