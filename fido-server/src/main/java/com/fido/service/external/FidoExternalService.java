@@ -261,7 +261,7 @@ public class FidoExternalService {
 			// Get distance
 			// Double dist = rootNode.path(distance).asDouble()/1000;
 			
-			Double dist = this.getDistanceDetails(device);
+			Double dist = this.getDistanceDetailsProgressively(device);
 
 			Date timestamp = new Date();
 			Long millis = null;
@@ -469,5 +469,106 @@ public class FidoExternalService {
 		return 0;
 
 	}
+	
+	
+	/**
+	 * Get distance based on progressive algo
+	 * @param device
+	 * @return
+	 * @throws IOException
+	 */
+	public double getDistanceDetailsProgressively(Device device) throws IOException {
+
+	    final int INITIAL_SAMPLE_COUNT = 100;
+	    final int MAX_SAMPLE_COUNT = 2000;
+	    final int RECENCY_THRESHOLD_MINUTES = 10;
+
+	    double lastDistance = 0.0;
+
+	    try {
+	        LocalDateTime now = LocalDateTime.now();
+	        LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
+
+	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd H:mm");
+
+	        String formattedStart = startOfDay.format(formatter);
+	        String formattedEnd = now.format(formatter);
+
+	        int sampleCount = INITIAL_SAMPLE_COUNT;
+
+	        while (sampleCount <= MAX_SAMPLE_COUNT) {
+	            System.out.println(device.getDeviceExternalId().intValue() + "----- " + formattedStart
+	                    + "-----" + formattedEnd + "----" + timezone + "-----" + sampleCount + "------" + google + "----" + "1" + "----" + en);
+
+	            String response = openAPIV4Soap.getDevicesHistory(
+	                device.getDeviceExternalId().intValue(),
+	                formattedStart,
+	                formattedEnd,
+	                timezone,
+	                0,
+	                google,
+	                sampleCount,
+	                en
+	            );
+
+	            System.out.println("Response for get History call for external Device ID :" + device.getDeviceExternalId()
+	                    + " :" + response);
+
+	            JsonNode rootNode = objectMapper.readTree(response);
+
+	            if ("0".equals(rootNode.path(state).asText())) {
+	                JsonNode extDevices = rootNode.get("devices");
+
+	                if (extDevices.isArray() && extDevices.size() > 0) {
+	                    JsonNode lastSample = extDevices.get(extDevices.size() - 1);
+
+	                    // Parse distance as string
+	                    String distanceStr = lastSample.get("distance").asText();
+	                    lastDistance = Double.parseDouble(distanceStr);
+
+	                    // Parse timestamp of last sample
+	                    String timestampStr = lastSample.get("date").asText();
+	                    LocalDateTime lastSampleTime = parseDeviceTimestamp(timestampStr);
+
+	                    if (lastSampleTime.isAfter(now.minusMinutes(RECENCY_THRESHOLD_MINUTES))) {
+	                        break; // sample is recent enough
+	                    }
+
+	                    if (extDevices.size() < sampleCount) {
+	                        break; // all data has been fetched
+	                    }
+
+	                } else {
+	                    return 0.0; // no data returned
+	                }
+
+	            } else {
+	                System.out.println("Could not find device history for external_deviceId: " + device.getDeviceExternalId());
+	                return 0.0;
+	            }
+
+	            sampleCount *= 2; // increase and retry
+	        }
+
+	    } catch (RemoteException e) {
+	        e.printStackTrace();
+	    }
+
+	    return lastDistance;
+	}
+	
+	
+	/**
+	 * Helper function for timestamp conversion
+	 * @param timestampStr
+	 * @return
+	 */
+	private LocalDateTime parseDeviceTimestamp(String timestampStr) {
+	    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+	    return LocalDateTime.parse(timestampStr, formatter);
+	}
+
+	
+	
 
 }
