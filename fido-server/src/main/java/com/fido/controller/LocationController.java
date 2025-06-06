@@ -1,6 +1,12 @@
 package com.fido.controller;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,6 +15,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.fido.model.Location;
 import com.fido.service.orchestrator.LocationOrchestratorService;
@@ -50,6 +57,28 @@ public class LocationController {
 	public Location getLocation(@RequestParam String imei)
 	{
 		return this.locationOrchestratorService.getLocation(imei);
+	}
+	
+	@GetMapping("/location/{imei}/history")
+	public List<Location> getLocationHistory(
+	    @PathVariable String imei,
+	    @RequestParam(required = false) String date // fallback to String
+	) 
+	{
+	    LocalDate parsedDate;
+
+	    try {
+	        if (date == null || date.isEmpty()) {
+	            parsedDate = LocalDate.now();
+	        } else {
+	            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	            parsedDate = LocalDate.parse(date, formatter);
+	        }
+	    } catch (DateTimeParseException ex) {
+	        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid date format. Use yyyy-MM-dd", ex);
+	    }
+
+	    return locationOrchestratorService.getLocationHistoryForDate(imei, parsedDate);
 	}
 
 }

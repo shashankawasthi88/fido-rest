@@ -1,6 +1,7 @@
 package com.fido.service.orchestrator;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.persistence.EntityNotFoundException;
@@ -81,5 +82,37 @@ public class LocationOrchestratorService {
 	{
 		this.locationService.deleteLocation(id);
 		return Boolean.TRUE;
+	}
+	
+	/**
+	 * Get historical location
+	 * @param imei
+	 * @param date
+	 * @return
+	 */
+	public List<Location> getLocationHistoryForDate(String imei, LocalDate date)
+	{
+		
+		List <DeviceEntity> deviceEntities =
+		this.deviceRepository.findByImei(imei);
+		  
+		if (deviceEntities == null || deviceEntities.isEmpty()) { throw new
+			EntityNotFoundException("No location found for imei :" + imei);
+		  
+		} 
+		  
+		DeviceEntity deviceEntity = deviceEntities.get(0);
+		Device device =  this.modelMapper.map(deviceEntity, Device.class);
+		try 
+		{
+			return this.externalService.getLocationHistory(device, date);
+		
+		} 
+		catch (IOException e) 
+		{
+			throw new ExternalCallException("Could not fetch the location from the external servers");
+		 }
+		
+		
 	}
 }

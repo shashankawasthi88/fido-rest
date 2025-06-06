@@ -4,10 +4,14 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -107,17 +111,17 @@ public class FidoExternalService {
 			// Act accordingly based on the value of "state"
 			if ("0".equals(state)) {
 				// Handle state "0"
-				System.out.println("State is 0, taking appropriate action.");
+				//System.out.println("State is 0, taking appropriate action.");
 				// login to get the User ID
 				response = openAPIV4Soap.login(user.getEmail(), "1234", 0);
-				System.out.println("Response from the server for login" + response);
+				//System.out.println("Response from the server for login" + response);
 
 				rootNode = objectMapper.readTree(response);
-				System.out.println("root node" + rootNode);
+				//System.out.println("root node" + rootNode);
 				JsonNode nodeUserID = rootNode.path("userInfo").path(userID);
-				System.out.println("user id node" + nodeUserID);
+				//System.out.println("user id node" + nodeUserID);
 				if (nodeUserID.isMissingNode()) {
-					System.out.println("Response from the server for login" + response + "User id is missing");
+					//System.out.println("Response from the server for login" + response + "User id is missing");
 					throw new RemoteException("Could not login user on remote");
 				}
 				// user.setId(userID.asLong());
@@ -127,7 +131,7 @@ public class FidoExternalService {
 				// get device list to get the device ID
 				response = openAPIV4Soap.getDeviceList(nodeUserID.asInt(), 0, google, en);
 
-				System.out.println("Response from the server for get device list" + response);
+				// System.out.println("Response from the server for get device list" + response);
 
 				rootNode = objectMapper.readTree(response);
 
@@ -142,27 +146,27 @@ public class FidoExternalService {
 
 				} else {
 
-					System.out.println(
-							"Response from the server for get device list" + response + "Could not fetch device list");
+					//System.out.println(
+					//		"Response from the server for get device list" + response + "Could not fetch device list");
 					throw new RemoteException("Could not fetch device list on remote");
 				}
 
 			} else if ("1008".equals(state)) {
-				System.out.println("registrtation failed with" + state);
+				// System.out.println("registrtation failed with" + state);
 				throw new RemoteException("Device IMEI already registered");
 			} else if ("1007".equals(state)) {
-				System.out.println("registrtation failed with" + state);
+				// System.out.println("registrtation failed with" + state);
 				throw new RemoteException("Device IMEI is invalid");
 			} else if ("1006".equals(state)) {
-				System.out.println("registrtation failed with" + state);
+				// System.out.println("registrtation failed with" + state);
 				throw new RemoteException("Email is already registered");
 			} else {
 
-				System.out.println("Response from the server for registration " + response + "the state is not 0");
+				// System.out.println("Response from the server for registration " + response + "the state is not 0");
 				throw new RemoteException("Could not create User on remote");
 			}
 		} else {
-			System.out.println("Response from the server for registration" + response + "There is no state object");
+			// System.out.println("Response from the server for registration" + response + "There is no state object");
 			throw new RemoteException("Could not create User on remote");
 		}
 
@@ -194,19 +198,19 @@ public class FidoExternalService {
 				// Device added successfully, get the device ID
 
 				response = openAPIV4Soap.getDeviceList((int) user.getUserExternalId(), 0, google, en);
-				System.out.println("Response from the get device list call" + response);
+				//System.out.println("Response from the get device list call" + response);
 				rootNode = objectMapper.readTree(response);
 				JsonNode arrNode = rootNode.path("arr");
 
-				System.out.println("Array of devices" + arrNode);
+				//System.out.println("Array of devices" + arrNode);
 				// Iterate through the array to find the matching 'sn'
 				if (arrNode.isArray()) {
 					for (JsonNode element : arrNode) {
 						String elementSn = element.path("sn").asText();
 						if (device.getImei().equals(elementSn)) {
 
-							System.out.println(
-									"Found the newley registered device in the device list array, adding its external ID ");
+							//System.out.println(
+							//		"Found the newley registered device in the device list array, adding its external ID ");
 
 							device.setDeviceExternalId(element.path(id).asLong());
 
@@ -217,13 +221,13 @@ public class FidoExternalService {
 
 				}
 			} else if ("1002".equals(state)) {
-				System.out.println("registrtation failed with" + state);
+				// System.out.println("registrtation failed with" + state);
 				throw new RemoteException("Device registration failed");
 			} else if ("1008".equals(state)) {
-				System.out.println("registrtation failed with" + state);
+				// System.out.println("registrtation failed with" + state);
 				throw new RemoteException("Device IMEI already registered");
 			} else if ("1007".equals(state)) {
-				System.out.println("registrtation failed with" + state);
+				// System.out.println("registrtation failed with" + state);
 				throw new RemoteException("Device IMEI does not exist");
 			}
 		}
@@ -269,7 +273,7 @@ public class FidoExternalService {
 				timestamp = dateFormat.parse((rootNode.path(lastCommunication).asText()));
 				millis = timestamp.getTime();
 			} catch (ParseException e) {
-				System.out.println("Issue in parsing date in get tracking call");
+				// System.out.println("Issue in parsing date in get tracking call");
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
@@ -292,7 +296,7 @@ public class FidoExternalService {
 			return location;
 
 		} else {
-			System.out.println("Response from the get tracking call is not state 0 :" + response);
+			// System.out.println("Response from the get tracking call is not state 0 :" + response);
 			throw new RemoteException("Could not fetch the location");
 		}
 	}
@@ -312,10 +316,10 @@ public class FidoExternalService {
 
 			if ("0".equals(rootNode.path(state).asText())) {
 
-				System.out.println("Device successfully deleted from remote");
+				// System.out.println("Device successfully deleted from remote");
 				return true;
 			} else {
-				System.out.println("Device could not be deleted from remote");
+				// System.out.println("Device could not be deleted from remote");
 
 				throw new RemoteException("Could not delte the device from remote server");
 			}
@@ -333,13 +337,13 @@ public class FidoExternalService {
 	 */
 	public void getActivityDetails() throws IOException {
 
-		System.out.println("getActivityDetails : This is running at a constant rate");
+		// System.out.println("getActivityDetails : This is running at a constant rate");
 
 		Calendar calendar = Calendar.getInstance();
 
 		List<Device> devices = this.deviceService.getDevices();
 		if (devices == null || devices.isEmpty()) {
-			System.out.println("getActivityDetails : No devices found to fetch the details for");
+			// System.out.println("getActivityDetails : No devices found to fetch the details for");
 			return;
 		}
 		for (Device device : devices) {
@@ -347,14 +351,14 @@ public class FidoExternalService {
 			double aggregateTime = 0.0;
 			try {
 
-				System.out.println(device.getDeviceExternalId().intValue() + "0"
-						+ String.valueOf(calendar.get(Calendar.HOUR_OF_DAY)) + ":00" + timezone + "1" + google + "10"
-						+ en);
+				//System.out.println(device.getDeviceExternalId().intValue() + "0"
+				//		+ String.valueOf(calendar.get(Calendar.HOUR_OF_DAY)) + ":00" + timezone + "1" + google + "10"
+				//		+ en);
 
 				String response = openAPIV4Soap.getDevicesHistory(device.getDeviceExternalId().intValue(), "0",
 						String.valueOf(calendar.get(Calendar.HOUR_OF_DAY)) + ":00", timezone, 1, google, 10, en);
-				System.out.println("Response for get History call for external Device ID :"
-						+ device.getDeviceExternalId() + " :" + response);
+				//System.out.println("Response for get History call for external Device ID :"
+				//		+ device.getDeviceExternalId() + " :" + response);
 
 				JsonNode rootNode = objectMapper.readTree(response);
 				// System.out.println("Response for get History call for external Device ID :" +
@@ -377,17 +381,17 @@ public class FidoExternalService {
 					Double activityTime = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE)
 							- aggregateTime;
 					device.setDailyActivityTime(activityTime);
-					System.out.println("Distance from the external service for extDevice: "
-							+ device.getDeviceExternalId() + " :" + aggregateDistance);
+				//	System.out.println("Distance from the external service for extDevice: "
+				//			+ device.getDeviceExternalId() + " :" + aggregateDistance);
 
-					System.out.println("Activity time from the external service for extDevice: "
-							+ device.getDeviceExternalId() + " :" + activityTime);
+				//	System.out.println("Activity time from the external service for extDevice: "
+				//			+ device.getDeviceExternalId() + " :" + activityTime);
 
 					// Update the device in the database
 					this.deviceService.updateDevice(device);
 				} else {
-					System.out.println(
-							"Count not find device history for external_deviceId :" + device.getDeviceExternalId());
+				//	System.out.println(
+				//			"Count not find device history for external_deviceId :" + device.getDeviceExternalId());
 
 					continue;
 				}
@@ -433,14 +437,14 @@ public class FidoExternalService {
 			
 			
 
-			System.out.println(device.getDeviceExternalId().intValue() + "----- "+ formattedTimeOneHourBefore
-					+"-----" + formattedCurrentTime + "----" + timezone +"-----" +"1" +"------" +google + "----"+"5" +"----" +en);
+			//System.out.println(device.getDeviceExternalId().intValue() + "----- "+ formattedTimeOneHourBefore
+			//		+"-----" + formattedCurrentTime + "----" + timezone +"-----" +"1" +"------" +google + "----"+"5" +"----" +en);
 			
 
 			String response = openAPIV4Soap.getDevicesHistory(device.getDeviceExternalId().intValue(), formattedTimeOneHourBefore,
 					formattedCurrentTime , timezone, 1, google, 5, en);
-			System.out.println("Response for get History call for external Device ID :" + device.getDeviceExternalId()
-					+ " :" + response);
+			//System.out.println("Response for get History call for external Device ID :" + device.getDeviceExternalId()
+			//		+ " :" + response);
 
 			JsonNode rootNode = objectMapper.readTree(response);
 			if ("0".equals(rootNode.path(state).asText())) {
@@ -451,13 +455,13 @@ public class FidoExternalService {
 						aggregateDistance = extDevice.get("distance").asDouble();
 					}
 				}
-				System.out.println("Distance from the external service for extDevice: " + device.getDeviceExternalId()
-						+ " :" + aggregateDistance);
+			//	System.out.println("Distance from the external service for extDevice: " + device.getDeviceExternalId()
+			//			+ " :" + aggregateDistance);
 				return aggregateDistance;
 
 			} else {
-				System.out.println(
-						"Count not find device history for external_deviceId :" + device.getDeviceExternalId());
+			//	System.out.println(
+			//			"Count not find device history for external_deviceId :" + device.getDeviceExternalId());
 
 			}
 
@@ -497,8 +501,9 @@ public class FidoExternalService {
 	        int sampleCount = INITIAL_SAMPLE_COUNT;
 
 	        while (sampleCount <= MAX_SAMPLE_COUNT) {
-	            System.out.println(device.getDeviceExternalId().intValue() + "----- " + formattedStart
-	                    + "-----" + formattedEnd + "----" + timezone + "-----" + sampleCount + "------" + google + "----" + "1" + "----" + en);
+	            
+	        	//System.out.println(device.getDeviceExternalId().intValue() + "----- " + formattedStart
+	            //        + "-----" + formattedEnd + "----" + timezone + "-----" + sampleCount + "------" + google + "----" + "1" + "----" + en);
 
 	            String response = openAPIV4Soap.getDevicesHistory(
 	                device.getDeviceExternalId().intValue(),
@@ -511,8 +516,8 @@ public class FidoExternalService {
 	                en
 	            );
 
-	            System.out.println("Response for get History call for external Device ID :" + device.getDeviceExternalId()
-	                    + " :" + response);
+	            //System.out.println("Response for get History call for external Device ID :" + device.getDeviceExternalId()
+	            //        + " :" + response);
 
 	            JsonNode rootNode = objectMapper.readTree(response);
 
@@ -569,6 +574,103 @@ public class FidoExternalService {
 	}
 
 	
+
+	/**
+	 * Get Location History
+	 * @param device
+	 * @param date
+	 * @return
+	 * @throws IOException
+	 */
+	public List<Location> getLocationHistory(Device device, LocalDate date) throws IOException {
+	    final int INITIAL_SAMPLE_COUNT = 200;
+	    final int MAX_SAMPLE_COUNT = 2000;
+
+	    List<Location> locationHistory = new ArrayList<>();
+
+	    try {
+	        LocalDateTime startOfDay = date.atStartOfDay();
+	        LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
+
+	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd H:mm");
+
+	        String formattedStart = startOfDay.format(formatter);
+	        String formattedEnd = endOfDay.format(formatter);
+
+	        int sampleCount = INITIAL_SAMPLE_COUNT;
+	        
+	      System.out.println(device.getDeviceExternalId().intValue() + "----- " + formattedStart
+                    + "-----" + formattedEnd + "----" + timezone + "-----" + sampleCount + "------" + google + "----" + "1" + "----" + en);
+
+
+	        while (sampleCount <= MAX_SAMPLE_COUNT) {
+	            String response = openAPIV4Soap.getDevicesHistory(
+	                    device.getDeviceExternalId().intValue(),
+	                    formattedStart,
+	                    formattedEnd,
+	                    timezone,
+	                    0,
+	                    google,
+	                    sampleCount,
+	                    en
+	            );
+	            System.out.println("Response for get History call for external Device ID :" + device.getDeviceExternalId()
+	                    + " :" + response);
+
+	            JsonNode rootNode = objectMapper.readTree(response);
+
+	            if ("0".equals(rootNode.path(state).asText())) {
+	                JsonNode extDevices = rootNode.get("devices");
+
+	                if (extDevices.isArray() && extDevices.size() > 0) {
+	                    locationHistory.clear();
+
+	                    for (JsonNode sample : extDevices) {
+	                        double lat = sample.has("lat") ? sample.get("lat").asDouble() : 0.0;
+	                        double lng = sample.has("lng") ? sample.get("lng").asDouble() : 0.0;
+	                        String timestampStr = sample.has("date") ? sample.get("date").asText() : null;
+
+	                        if (timestampStr != null) {
+	                        	LocalDateTime timestamp = parseDeviceTimestamp(timestampStr);
+
+	                        	// Convert LocalDateTime to java.util.Date
+	                        	Date date1 = Date.from(timestamp.atZone(ZoneId.systemDefault()).toInstant());
+
+	                        	Location location = new Location();
+	                        	location.setLatitude(lat);
+	                        	location.setLongitude(lng);
+	                        	location.setImei(device.getImei());
+	                        	location.setTimestamp(date1); // Set java.util.Date
+	                        	location.setLongTimeStamp(date1.getTime()); // Epoch millis
+
+	                        	locationHistory.add(location);
+	                        }
+	                    }
+
+	                    if (extDevices.size() < sampleCount) {
+	                        break;
+	                    }
+
+	                } else {
+	                    return Collections.emptyList(); // No data
+	                }
+
+	            } else {
+	                throw new RuntimeException("External API failed for deviceId: " + device.getDeviceExternalId());
+	            }
+
+	            sampleCount *= 2; // Try fetching more
+	        }
+
+	    } catch (RemoteException e) {
+	        e.printStackTrace();
+	        throw new IOException("Failed to fetch location history");
+	    }
+
+	    return locationHistory;
+	}
+
+
 	
 
 }
