@@ -28,6 +28,7 @@ import com.fido.model.Location;
 import com.fido.model.User;
 import com.fido.service.internal.DeviceService;
 import com.fido.service.internal.UserService;
+import com.fido.util.DogWalkingDistanceCalculator;
 import com.fido.wsclient.OpenAPIV4Locator;
 import com.fido.wsclient.OpenAPIV4Soap;
 
@@ -265,7 +266,7 @@ public class FidoExternalService {
 			// Get distance
 			// Double dist = rootNode.path(distance).asDouble()/1000;
 			
-			Double dist = this.getDistanceDetailsProgressively(device);
+			Double dist = this.getDistanceDetailsfromHistory(device);
 
 			Date timestamp = new Date();
 			Long millis = null;
@@ -669,6 +670,98 @@ public class FidoExternalService {
 
 	    return locationHistory;
 	}
+	
+	
+	
+	
+	/**
+	 * Get distance details using the lat long coordinates from history data 
+	 * @param device
+	 * @return
+	 * @throws IOException
+	 */
+	private double getDistanceDetailsfromHistory(Device device) throws IOException {
+
+	    final int INITIAL_SAMPLE_COUNT = 100;
+	    final int MAX_SAMPLE_COUNT = 2000;
+	    final int RECENCY_THRESHOLD_MINUTES = 10;
+
+	    double totalDistance = 0.0;
+
+	    try {
+	        LocalDateTime now = LocalDateTime.now();
+	        LocalDateTime startOfDay = now.toLocalDate().atStartOfDay();
+
+	        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd H:mm");
+
+	        String formattedStart = startOfDay.format(formatter);
+	        String formattedEnd = now.format(formatter);
+
+	        int sampleCount = INITIAL_SAMPLE_COUNT;
+	        
+	        System.out.println(device.getDeviceExternalId().intValue() + "----- " + formattedStart
+                    + "-----" + formattedEnd + "----" + timezone + "-----" + sampleCount + "------" + google + "----" + "1" + "----" + en);
+
+
+	        while (sampleCount <= MAX_SAMPLE_COUNT) {
+
+	            String response = openAPIV4Soap.getDevicesHistory(
+	                device.getDeviceExternalId().intValue(),
+	                formattedStart,
+	                formattedEnd,
+	                timezone,
+	                0,
+	                google,
+	                sampleCount,
+	                en
+	            );
+	            // Step 2: Parse the JSON
+	            JsonNode rootNode = objectMapper.readTree(response);
+
+	            if ("0".equals(rootNode.path("state").asText())) {
+	                JsonNode extDevices = rootNode.get("devices");
+
+	                if (extDevices.isArray() && extDevices.size() > 1) {
+	                    // Step 3: Build list of GPS points
+	                    List<DogWalkingDistanceCalculator.GPSPoint> points = new ArrayList<>();
+	                    for (JsonNode deviceNode : extDevices) {
+	                        double lat = deviceNode.get("lat").asDouble();
+	                        double lng = deviceNode.get("lng").asDouble();
+	                        String timestamp = deviceNode.get("date").asText();
+	                        points.add(new DogWalkingDistanceCalculator.GPSPoint(lat, lng, timestamp));
+	                    }
+
+	                    // Step 4: Calculate total distance. Remove any distance that has speed more than 12KMP.
+	                    totalDistance = DogWalkingDistanceCalculator.calculateTotalWalkedDistance(points, 12);
+
+	                    // Step 5: Check recency of last point
+	                    String lastTimestamp = extDevices.get(extDevices.size() - 1).get("date").asText();
+	                    LocalDateTime lastSampleTime = parseDeviceTimestamp(lastTimestamp);
+	                    if (lastSampleTime.isAfter(now.minusMinutes(RECENCY_THRESHOLD_MINUTES))) {
+	                        break;
+	                    }
+
+	                    if (extDevices.size() < sampleCount) {
+	                        break;
+	                    }
+	                } else {
+	                    return 0.0;
+	                }
+	            } else {
+	                System.out.println("Invalid state for external_deviceId: " + device.getDeviceExternalId());
+	                return 0.0;
+	            }
+
+	            sampleCount *= 2;
+	        }
+
+	    } catch (RemoteException e) {
+	        e.printStackTrace();
+	    }
+
+	    return totalDistance;
+	}
+
 
 
 	
