@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.fido.entity.DeviceEntity;
 import com.fido.exceptionhandler.ExternalCallException;
 import com.fido.model.Device;
+import com.fido.model.HistoricalLocation;
 import com.fido.model.Location;
 import com.fido.repository.DeviceRepository;
 import com.fido.service.external.FidoExternalService;
@@ -90,7 +91,7 @@ public class LocationOrchestratorService {
 	 * @param date
 	 * @return
 	 */
-	public List<Location> getLocationHistoryForDate(String imei, LocalDate date)
+	public HistoricalLocation getLocationHistoryForDate(String imei, LocalDate date)
 	{
 		
 		List <DeviceEntity> deviceEntities =

@@ -2,6 +2,7 @@ package com.fido.util;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class DogWalkingDistanceCalculator {
@@ -15,7 +16,7 @@ public class DogWalkingDistanceCalculator {
         public GPSPoint(double lat, double lon, String timestampStr) {
             this.latitude = lat;
             this.longitude = lon;
-            this.timestamp = LocalDateTime.parse(timestampStr);
+            this.timestamp = LocalDateTime.parse(timestampStr, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
         }
     }
 
