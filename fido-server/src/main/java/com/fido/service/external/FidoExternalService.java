@@ -100,7 +100,7 @@ public class FidoExternalService {
 		String response = openAPIV4Soap.userRegister(device.getImei(), user.getEmail(), "1234", user.getUserPhoneNo(),
 				device.getDeviceName(), 0);
 
-		System.out.println("Response from the server for registration" + response);
+		//System.out.println("Response from the server for registration" + response);
 
 		JsonNode rootNode = objectMapper.readTree(response);
 
@@ -501,7 +501,10 @@ public class FidoExternalService {
 				}
 
 			} else {
-				throw new RuntimeException("External API failed for deviceId: " + device.getDeviceExternalId());
+				// The external system returns a non 0 response when there are no coordinates for a day
+				//, hence returning empty object rather than throwing an exception
+				return historicalLocation; // No data
+				//throw new RuntimeException("External API failed for deviceId: " + device.getDeviceExternalId());
 			}
 
 		} catch (RemoteException e) {
@@ -577,7 +580,7 @@ public class FidoExternalService {
 						return 0.0;
 					}
 				} else {
-					System.out.println("Invalid state for external_deviceId: " + device.getDeviceExternalId());
+					//System.out.println("Invalid state for external_deviceId: " + device.getDeviceExternalId());
 					return 0.0;
 				}
 
