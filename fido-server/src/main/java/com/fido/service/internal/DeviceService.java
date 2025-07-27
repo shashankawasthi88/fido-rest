@@ -2,12 +2,16 @@ package com.fido.service.internal;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
+
 
 import javax.persistence.EntityNotFoundException;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 
 import com.fido.entity.DeviceEntity;
 import com.fido.entity.UserEntity;
@@ -80,12 +84,34 @@ public class DeviceService {
 		return device;
 	}
 	
+	/* @Transactional
 	public Boolean deleteDevice (Long id)
 	{
+		
+		System.out.println("Deleting device :" +id);
+		System.out.println("Exists before delete? " + deviceRepository.existsById(id));
+
 		this.deviceRepository.deleteById(id);
 		return Boolean.TRUE;
-	}
+	} */
 
+	
+	
+	
+	@Transactional
+	public Boolean deleteDevice(Long id) {
+	    Optional<DeviceEntity> deviceOpt = deviceRepository.findById(id);
+	    if (deviceOpt.isPresent()) {
+	        DeviceEntity device = deviceOpt.get();
+	        UserEntity user = device.getUserEntity();
+	        if (user != null) {
+	            user.getDeviceEntities().remove(device);  // <-- remove from the collection
+	        }
+	        deviceRepository.delete(device);
+	        return true;
+	    }
+	    return false;
+	}
 	
 	
 	/**

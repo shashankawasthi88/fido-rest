@@ -103,6 +103,7 @@ public class DeviceIOrchestratorService {
 		if (isDeleted)
 		{
 			// Delete from local
+			System.out.println("Deleting device :" +id);
 			return this.deviceService.deleteDevice(id);
 		}
 		else 
