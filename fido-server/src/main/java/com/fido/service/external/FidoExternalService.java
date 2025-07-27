@@ -329,12 +329,12 @@ public class FidoExternalService {
 			} else {
 				// System.out.println("Device could not be deleted from remote");
 
-				throw new RemoteException("Could not delte the device from remote server");
+				throw new RemoteException("Could not delete the device from remote server");
 			}
 
 		} catch (RemoteException e) {
 			e.printStackTrace();
-			throw new RemoteException("Could not delte the device from remote server");
+			throw new RemoteException("Could not delete the device from remote server");
 		}
 	}
 
